@@ -255,7 +255,7 @@ def show_menu_gallery():
             """, unsafe_allow_html=True)
 
             st.markdown('<div class="menu-image-container">', unsafe_allow_html=True)
-            st.image(str(menu_food_path), use_column_width=True)
+            st.image(str(menu_food_path), use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
             st.markdown("<br>", unsafe_allow_html=True)
@@ -269,7 +269,7 @@ def show_menu_gallery():
             """, unsafe_allow_html=True)
 
             st.markdown('<div class="menu-image-container">', unsafe_allow_html=True)
-            st.image(str(menu_drinks_path), use_column_width=True)
+            st.image(str(menu_drinks_path), use_container_width=True)
             st.markdown('</div>', unsafe_allow_html=True)
     else:
         st.info("📷 Hình ảnh menu sẽ được cập nhật sớm")
