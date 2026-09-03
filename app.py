@@ -22,169 +22,329 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for better UI
+# Custom CSS for modern, student-friendly UI
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
+    /* Global Styles */
     * {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .main .block-container {
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+        max-width: 1200px;
+    }
+
+    /* Hero Header */
+    .hero-header {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 24px;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="white" opacity="0.05"/></svg>');
+        opacity: 0.3;
     }
 
     .main-header {
-        font-size: clamp(1.75rem, 4vw, 2.25rem);
-        font-weight: 700;
-        background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        text-align: center;
+        font-size: clamp(2rem, 5vw, 3rem);
+        font-weight: 800;
+        color: #FFFFFF;
         margin-bottom: 0.5rem;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.03em;
+        text-shadow: 0 2px 20px rgba(0,0,0,0.2);
+        position: relative;
+        z-index: 1;
     }
+
     .sub-header {
-        font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-        color: #64748B;
-        text-align: center;
-        margin-bottom: 1.5rem;
+        font-size: clamp(1rem, 2.5vw, 1.25rem);
+        color: rgba(255, 255, 255, 0.95);
+        font-weight: 400;
+        position: relative;
+        z-index: 1;
     }
-    .menu-section {
-        background: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
-        padding: 2rem;
+
+    /* Tab Navigation */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 0.75rem;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e8edf4 100%);
+        padding: 0.75rem;
         border-radius: 16px;
-        margin: 2rem 0;
-        border: 1px solid #CBD5E1;
+        margin-bottom: 2rem;
+        box-shadow: inset 0 2px 8px rgba(0,0,0,0.06);
     }
-    .menu-section h3 {
-        color: #1E293B;
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-        text-align: center;
-    }
-    .menu-image-container {
-        max-width: 500px;
-        margin: 0 auto;
+
+    .stTabs [data-baseweb="tab"] {
         border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .menu-image-container:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
-    }
-    .menu-image-container img {
-        width: 100%;
-        height: auto;
-        display: block;
-    }
-    .combo-card {
-        background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
-        padding: 1.5rem;
-        border-radius: 12px;
-        border: 1px solid #E2E8F0;
-        margin-bottom: 1rem;
-        color: #1E293B;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        padding: 0.875rem 1.75rem;
+        font-weight: 600;
+        font-size: 0.95rem;
+        color: #64748B;
+        background-color: transparent;
         transition: all 0.3s ease;
+        border: none;
     }
-    .combo-card:hover {
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-        transform: translateY(-2px);
-    }
-    .combo-card h3 {
-        margin-top: 0;
-        letter-spacing: -0.01em;
-        color: #1E293B;
-    }
-    .score-badge {
-        background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
-        color: #FFFFFF;
-        padding: 0.4rem 0.9rem;
-        border-radius: 999px;
-        font-weight: 600;
-        font-size: 0.95rem;
-        display: inline-block;
-    }
-    .price-badge {
-        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-        color: #FFFFFF;
-        padding: 0.4rem 0.9rem;
-        border-radius: 999px;
-        font-weight: 600;
-        font-size: 0.95rem;
-        display: inline-block;
-    }
-    .reasoning-box {
-        background: #F8FAFC;
-        border-left: 3px solid #3B82F6;
-        padding: 1rem;
-        margin-top: 1rem;
-        border-radius: 8px;
-        color: #334155;
-    }
-    .pipeline-step {
-        background: #FFFFFF;
-        padding: 1.5rem;
-        border-radius: 12px;
-        border-left: 4px solid #3B82F6;
-        border: 1px solid #E2E8F0;
-        margin-bottom: 1rem;
-        color: #1E293B;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    }
-    .pipeline-step h4 {
-        color: #3B82F6;
-        margin-top: 0;
-    }
-    .pipeline-step ul {
+
+    .stTabs [data-baseweb="tab"]:hover {
+        background-color: rgba(255, 255, 255, 0.5);
         color: #475569;
     }
+
+    .stTabs [data-baseweb="tab"][aria-selected="true"] {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #FFFFFF;
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Input Section */
+    .input-section {
+        background: #FFFFFF;
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+        border: 1px solid #E2E8F0;
+    }
+
+    .input-section h2, .input-section h3 {
+        color: #1E293B;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Menu Gallery */
+    .menu-section {
+        background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
+        padding: 2.5rem;
+        border-radius: 24px;
+        margin: 2rem 0;
+        border: 1px solid #E2E8F0;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    }
+
+    .menu-section h3 {
+        color: #1E293B;
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .menu-image-container {
+        max-width: 600px;
+        margin: 0 auto;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 3px solid #FFFFFF;
+    }
+
+    .menu-image-container:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.25);
+    }
+
+    /* Combo Result Cards */
+    .combo-card {
+        background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
+        padding: 2rem;
+        border-radius: 20px;
+        border: 2px solid #E2E8F0;
+        margin-bottom: 1.5rem;
+        color: #1E293B;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .combo-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 6px;
+        height: 100%;
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .combo-card:hover {
+        box-shadow: 0 12px 32px rgba(102, 126, 234, 0.2);
+        transform: translateY(-4px);
+        border-color: #667eea;
+    }
+
+    .combo-card h3 {
+        margin-top: 0;
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: #1E293B;
+        margin-bottom: 1.25rem;
+        letter-spacing: -0.02em;
+    }
+
+    .combo-rank {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Badges */
+    .score-badge {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: #FFFFFF;
+        padding: 0.5rem 1.25rem;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 1rem;
+        display: inline-block;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .price-badge {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: #FFFFFF;
+        padding: 0.5rem 1.25rem;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 1rem;
+        display: inline-block;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    /* Buttons */
     .stButton>button {
-        background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: #FFFFFF;
         font-weight: 600;
         border: none;
         border-radius: 999px;
-        padding: 0.75rem 2rem;
-        font-size: 1rem;
+        padding: 0.875rem 2.5rem;
+        font-size: 1.05rem;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        text-transform: none;
+        letter-spacing: 0.01em;
     }
+
     .stButton>button:hover {
-        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        box-shadow: 0 8px 28px rgba(102, 126, 234, 0.5);
     }
-    .section-divider {
-        height: 1px;
-        background: linear-gradient(90deg, transparent, #CBD5E1, transparent);
-        margin: 2rem 0;
+
+    .stButton>button:active {
+        transform: translateY(0);
     }
+
+    /* Info Boxes */
+    .pipeline-step {
+        background: #FFFFFF;
+        padding: 2rem;
+        border-radius: 16px;
+        border: 2px solid #E2E8F0;
+        margin-bottom: 1.5rem;
+        color: #1E293B;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s ease;
+    }
+
+    .pipeline-step:hover {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        border-color: #667eea;
+    }
+
+    .pipeline-step h4 {
+        color: #667eea;
+        margin-top: 0;
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    .pipeline-step ul {
+        color: #475569;
+        line-height: 1.8;
+    }
+
     .info-box {
-        background: #F8FAFC;
-        border: 1px solid #E2E8F0;
-        border-radius: 12px;
-        padding: 1.5rem;
-        color: #334155;
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        border: 2px solid #bae6fd;
+        border-radius: 16px;
+        padding: 2rem;
+        color: #0c4a6e;
+        margin: 1.5rem 0;
     }
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 0.5rem;
-        background-color: #F1F5F9;
-        padding: 0.5rem;
-        border-radius: 12px;
+
+    /* Dividers */
+    .section-divider {
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #cbd5e1, transparent);
+        margin: 3rem 0;
     }
-    .stTabs [data-baseweb="tab"] {
-        border-radius: 8px;
-        padding: 0.75rem 1.5rem;
+
+    /* Expander */
+    .streamlit-expanderHeader {
+        background-color: #f8fafc;
+        border-radius: 12px;
         font-weight: 600;
-        color: #64748B;
-        background-color: transparent;
+        color: #475569;
     }
-    .stTabs [data-baseweb="tab"][aria-selected="true"] {
-        background-color: #FFFFFF;
-        color: #3B82F6;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    .streamlit-expanderHeader:hover {
+        background-color: #f1f5f9;
+        color: #1e293b;
+    }
+
+    /* Success/Error Messages */
+    .stSuccess {
+        background-color: #d1fae5;
+        color: #065f46;
+        border-radius: 12px;
+        padding: 1rem;
+    }
+
+    .stError {
+        background-color: #fee2e2;
+        color: #991b1b;
+        border-radius: 12px;
+        padding: 1rem;
+    }
+
+    /* Slider */
+    .stSlider > div > div > div {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -203,11 +363,13 @@ def initialize_system():
 def main():
     initialize_system()
 
-    # Header
-    st.markdown('<div class="main-header">🍽️ Hệ thống AI gợi ý món ăn</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Căn tin Trường Đại học Giao thông Vận tải TP.HCM</div>', unsafe_allow_html=True)
-
-    st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+    # Hero Header
+    st.markdown("""
+    <div class="hero-header">
+        <div class="main-header">🍽️ Hệ thống AI gợi ý món ăn</div>
+        <div class="sub-header">Căn tin Trường Đại học Giao thông Vận tải TP.HCM</div>
+    </div>
+    """, unsafe_allow_html=True)
 
     # Create tabs
     tab1, tab2, tab3, tab4 = st.tabs([
@@ -232,12 +394,13 @@ def main():
 
 def show_menu_gallery():
     """Display canteen menu images in a separate tab"""
-    st.header("📋 Menu Căn tin UTH")
-
     st.markdown("""
-    <div style="text-align: center; color: #64748B; margin-bottom: 2rem;">
+    <h2 style="text-align: center; color: #1E293B; font-weight: 800; margin-bottom: 1rem;">
+        📋 Menu Căn tin UTH
+    </h2>
+    <p style="text-align: center; color: #64748B; font-size: 1.1rem; margin-bottom: 3rem;">
         Xem menu thực tế của căn tin để tham khảo các món ăn có sẵn
-    </div>
+    </p>
     """, unsafe_allow_html=True)
 
     assets_path = Path(__file__).parent / "assets"
@@ -251,42 +414,49 @@ def show_menu_gallery():
             st.markdown("""
             <div class="menu-section">
                 <h3>🍚 Menu Món Ăn</h3>
+                <div class="menu-image-container">
+            """, unsafe_allow_html=True)
+
+            st.image(str(menu_food_path), use_container_width=True)
+
+            st.markdown("""
+                </div>
             </div>
             """, unsafe_allow_html=True)
 
-            st.markdown('<div class="menu-image-container">', unsafe_allow_html=True)
-            st.image(str(menu_food_path), use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-
-            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("<br><br>", unsafe_allow_html=True)
 
         # Menu đồ uống
         if menu_drinks_path.exists():
             st.markdown("""
             <div class="menu-section">
                 <h3>🥤 Menu Đồ Uống</h3>
-            </div>
+                <div class="menu-image-container">
             """, unsafe_allow_html=True)
 
-            st.markdown('<div class="menu-image-container">', unsafe_allow_html=True)
             st.image(str(menu_drinks_path), use_container_width=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+
+            st.markdown("""
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
     else:
         st.info("📷 Hình ảnh menu sẽ được cập nhật sớm")
 
 
 def show_recommendation_interface():
     """Main recommendation interface (Tab 1)"""
-    st.header("Nhập thông tin của bạn")
+    st.markdown('<div class="input-section">', unsafe_allow_html=True)
+    st.header("📝 Nhập thông tin của bạn")
 
     col1, col2 = st.columns([1, 1])
 
     with col1:
-        st.subheader("Thông tin cơ bản")
+        st.subheader("💰 Thông tin cơ bản")
 
         # Budget input
         budget = st.slider(
-            "💰 Ngân sách (VND)",
+            "Ngân sách (VND)",
             min_value=20000,
             max_value=100000,
             value=50000,
@@ -311,7 +481,7 @@ def show_recommendation_interface():
         diet = DietType.CHAY if "Chay" in diet_display else DietType.MAN
 
     with col2:
-        st.subheader("Sở thích & Trạng thái")
+        st.subheader("🎯 Sở thích & Trạng thái")
 
         # Hunger level
         hunger_level = st.select_slider(
@@ -349,19 +519,23 @@ def show_recommendation_interface():
             if st.checkbox("Trà sữa", value=False):
                 taste_prefs.append("trà sữa")
 
-    st.markdown("---")
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
 
     # Search button
-    if st.button("🔍 Tìm kiếm món ăn phù hợp", use_container_width=True):
-        with st.spinner("AI đang tìm kiếm và phân tích..."):
-            recommendations = get_recommendations(
-                budget, meal_time, diet, hunger_level, is_thirsty, taste_prefs
-            )
+    col_center = st.columns([1, 2, 1])
+    with col_center[1]:
+        if st.button("🔍 Tìm kiếm món ăn phù hợp", use_container_width=True):
+            with st.spinner("🤖 AI đang phân tích và tìm kiếm combo tốt nhất..."):
+                recommendations = get_recommendations(
+                    budget, meal_time, diet, hunger_level, is_thirsty, taste_prefs
+                )
 
-            if recommendations:
-                display_recommendations(recommendations)
-            else:
-                st.error("😔 Không tìm thấy combo nào phù hợp với yêu cầu của bạn. Hãy thử tăng ngân sách hoặc điều chỉnh tiêu chí!")
+                if recommendations:
+                    display_recommendations(recommendations)
+                else:
+                    st.error("😔 Không tìm thấy combo nào phù hợp với yêu cầu của bạn. Hãy thử tăng ngân sách hoặc điều chỉnh tiêu chí!")
 
 
 def get_recommendations(budget, meal_time, diet, hunger_level, is_thirsty, taste_prefs):
@@ -399,8 +573,14 @@ def display_recommendations(result):
         st.error("😔 Không tìm thấy combo nào phù hợp với yêu cầu của bạn. Hãy thử tăng ngân sách hoặc điều chỉnh tiêu chí!")
         return
 
-    st.success("✅ Tìm thấy các combo phù hợp!")
-    st.header(f"🎯 Top {len(result.ranked_solutions)} gợi ý cho bạn")
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.success("✅ Đã tìm thấy các combo phù hợp!")
+
+    st.markdown(f"""
+    <h2 style="text-align: center; color: #1E293B; font-weight: 800; margin: 2rem 0;">
+        🎯 Top {len(result.ranked_solutions)} gợi ý dành cho bạn
+    </h2>
+    """, unsafe_allow_html=True)
 
     utility_function = st.session_state.inference_engine.utility_function
 
@@ -447,18 +627,19 @@ def display_recommendations(result):
         with st.container():
             st.markdown(f"""
             <div class="combo-card">
-                <h3>#{idx} - {food_emoji} {food.name} + {drink_emoji} {drink.name}</h3>
-                <p style="font-size: 1rem; margin-top: 1rem;">
-                    <span class="price-badge">{int(solution.assignment.get_total_price()):,} VND</span>
-                    <span style="margin: 0 1rem; color: #94A3B8;">•</span>
-                    <span class="score-badge">{solution.normalized_score:.1f}/100 điểm</span>
+                <div class="combo-rank">#{idx}</div>
+                <h3>{food_emoji} {food.name} + {drink_emoji} {drink.name}</h3>
+                <p style="font-size: 1.05rem; margin-top: 1.25rem;">
+                    <span class="price-badge">💰 {int(solution.assignment.get_total_price()):,} VND</span>
+                    <span style="margin: 0 1rem; color: #CBD5E1;">•</span>
+                    <span class="score-badge">⭐ {solution.normalized_score:.1f}/100 điểm</span>
                 </p>
             </div>
             """, unsafe_allow_html=True)
 
             # Expandable reasoning section
-            with st.expander("🧠 Vì sao gợi ý món này?"):
-                st.markdown("### 📋 Lý do chi tiết:")
+            with st.expander("🧠 Tại sao gợi ý combo này?"):
+                st.markdown("#### 📋 Lý do chi tiết:")
                 for criterion, reason in solution.criteria_reasons.items():
                     st.markdown(f"- {reason}")
 
@@ -466,7 +647,7 @@ def display_recommendations(result):
                 st.markdown(utility_function.format_score_breakdown(solution))
 
     # Show complete inference trace
-    st.markdown("---")
+    st.markdown("<br><br>", unsafe_allow_html=True)
     with st.expander("🔬 Xem chi tiết suy luận AI (CSP + Backtracking + Utility)"):
         trace = format_complete_trace(result)
         st.markdown(trace)
