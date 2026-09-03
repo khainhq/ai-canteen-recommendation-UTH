@@ -32,134 +32,159 @@ st.markdown("""
     }
 
     .main-header {
-        font-size: clamp(2rem, 5vw, 2.5rem);
+        font-size: clamp(1.75rem, 4vw, 2.25rem);
         font-weight: 700;
-        color: #0A0D12;
+        background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
         text-align: center;
         margin-bottom: 0.5rem;
         letter-spacing: -0.02em;
     }
     .sub-header {
-        font-size: clamp(1rem, 3vw, 1.2rem);
-        color: #475569;
+        font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+        color: #64748B;
         text-align: center;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
-    .menu-gallery {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 1.5rem;
-        margin: 2rem 0;
-    }
-    .menu-card {
-        background: #0F131C;
+    .menu-section {
+        background: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
+        padding: 2rem;
         border-radius: 16px;
+        margin: 2rem 0;
+        border: 1px solid #CBD5E1;
+    }
+    .menu-section h3 {
+        color: #1E293B;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    .menu-image-container {
+        max-width: 500px;
+        margin: 0 auto;
+        border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        transition: transform 0.3s ease;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .menu-card:hover {
+    .menu-image-container:hover {
         transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
     }
-    .menu-card img {
+    .menu-image-container img {
         width: 100%;
         height: auto;
         display: block;
     }
-    .menu-label {
-        padding: 1rem;
-        text-align: center;
-        color: #F8FAFC;
-        font-weight: 600;
-        font-size: 1.1rem;
-        background: linear-gradient(135deg, #161D2B 0%, #0F131C 100%);
-    }
     .combo-card {
-        background: linear-gradient(135deg, #0F131C 0%, #161D2B 100%);
+        background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
         padding: 1.5rem;
-        border-radius: 16px;
-        border: 1px solid #1E2636;
+        border-radius: 12px;
+        border: 1px solid #E2E8F0;
         margin-bottom: 1rem;
-        color: #F8FAFC;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        color: #1E293B;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+    }
+    .combo-card:hover {
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        transform: translateY(-2px);
     }
     .combo-card h3 {
         margin-top: 0;
         letter-spacing: -0.01em;
+        color: #1E293B;
     }
     .score-badge {
-        background: #38BDF8;
-        color: #0A0D12;
-        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+        color: #FFFFFF;
+        padding: 0.4rem 0.9rem;
         border-radius: 999px;
-        font-weight: 700;
-        font-size: 1.1rem;
+        font-weight: 600;
+        font-size: 0.95rem;
         display: inline-block;
     }
     .price-badge {
-        background: #E9A568;
-        color: #0A0D12;
-        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        color: #FFFFFF;
+        padding: 0.4rem 0.9rem;
         border-radius: 999px;
         font-weight: 600;
+        font-size: 0.95rem;
         display: inline-block;
     }
     .reasoning-box {
-        background: #161D2B;
-        border-left: 3px solid #38BDF8;
+        background: #F8FAFC;
+        border-left: 3px solid #3B82F6;
         padding: 1rem;
         margin-top: 1rem;
         border-radius: 8px;
+        color: #334155;
     }
     .pipeline-step {
-        background: #0F131C;
+        background: #FFFFFF;
         padding: 1.5rem;
         border-radius: 12px;
-        border-left: 4px solid #38BDF8;
+        border-left: 4px solid #3B82F6;
+        border: 1px solid #E2E8F0;
         margin-bottom: 1rem;
-        color: #F8FAFC;
+        color: #1E293B;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     }
     .pipeline-step h4 {
-        color: #38BDF8;
+        color: #3B82F6;
         margin-top: 0;
     }
     .pipeline-step ul {
-        color: #E2E8F0;
+        color: #475569;
     }
     .stButton>button {
-        background: linear-gradient(135deg, #38BDF8 0%, #22D3EE 100%);
-        color: #0A0D12;
+        background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+        color: #FFFFFF;
         font-weight: 600;
         border: none;
         border-radius: 999px;
         padding: 0.75rem 2rem;
         font-size: 1rem;
         transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
     .stButton>button:hover {
-        background: linear-gradient(135deg, #22D3EE 0%, #38BDF8 100%);
+        background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
     }
     .section-divider {
-        height: 2px;
-        background: linear-gradient(90deg, transparent, #38BDF8, transparent);
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #CBD5E1, transparent);
         margin: 2rem 0;
     }
     .info-box {
-        background: #0F131C;
-        border: 1px solid #1E2636;
+        background: #F8FAFC;
+        border: 1px solid #E2E8F0;
         border-radius: 12px;
         padding: 1.5rem;
-        color: #E2E8F0;
+        color: #334155;
     }
     .stTabs [data-baseweb="tab-list"] {
-        gap: 1rem;
+        gap: 0.5rem;
+        background-color: #F1F5F9;
+        padding: 0.5rem;
+        border-radius: 12px;
     }
     .stTabs [data-baseweb="tab"] {
-        border-radius: 12px 12px 0 0;
+        border-radius: 8px;
         padding: 0.75rem 1.5rem;
         font-weight: 600;
+        color: #64748B;
+        background-color: transparent;
+    }
+    .stTabs [data-baseweb="tab"][aria-selected="true"] {
+        background-color: #FFFFFF;
+        color: #3B82F6;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -182,30 +207,12 @@ def main():
     st.markdown('<div class="main-header">🍽️ Hệ thống AI gợi ý món ăn</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Căn tin Trường Đại học Giao thông Vận tải TP.HCM</div>', unsafe_allow_html=True)
 
-    # Display real menu images
-    st.markdown("### 📋 Menu Căn tin UTH")
-
-    assets_path = Path(__file__).parent / "assets"
-
-    if assets_path.exists():
-        col1, col2 = st.columns(2)
-
-        menu_food_path = assets_path / "menu_food.jpg"
-        menu_drinks_path = assets_path / "menu_drinks.jpg"
-
-        with col1:
-            if menu_food_path.exists():
-                st.image(str(menu_food_path), caption="Menu Món ăn", use_container_width=True)
-
-        with col2:
-            if menu_drinks_path.exists():
-                st.image(str(menu_drinks_path), caption="Menu Đồ uống", use_container_width=True)
-
     st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
     # Create tabs
-    tab1, tab2, tab3 = st.tabs([
+    tab1, tab2, tab3, tab4 = st.tabs([
         "🔍 Tìm món ăn phù hợp",
+        "📋 Menu Căn tin",
         "🤖 Cách AI hoạt động",
         "⚙️ Cài đặt nâng cao"
     ])
@@ -214,10 +221,58 @@ def main():
         show_recommendation_interface()
 
     with tab2:
-        show_ai_explanation()
+        show_menu_gallery()
 
     with tab3:
+        show_ai_explanation()
+
+    with tab4:
         show_advanced_settings()
+
+
+def show_menu_gallery():
+    """Display canteen menu images in a separate tab"""
+    st.header("📋 Menu Căn tin UTH")
+
+    st.markdown("""
+    <div style="text-align: center; color: #64748B; margin-bottom: 2rem;">
+        Xem menu thực tế của căn tin để tham khảo các món ăn có sẵn
+    </div>
+    """, unsafe_allow_html=True)
+
+    assets_path = Path(__file__).parent / "assets"
+
+    if assets_path.exists():
+        menu_food_path = assets_path / "menu_food.jpg"
+        menu_drinks_path = assets_path / "menu_drinks.jpg"
+
+        # Menu món ăn
+        if menu_food_path.exists():
+            st.markdown("""
+            <div class="menu-section">
+                <h3>🍚 Menu Món Ăn</h3>
+            </div>
+            """, unsafe_allow_html=True)
+
+            st.markdown('<div class="menu-image-container">', unsafe_allow_html=True)
+            st.image(str(menu_food_path), use_column_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+
+            st.markdown("<br>", unsafe_allow_html=True)
+
+        # Menu đồ uống
+        if menu_drinks_path.exists():
+            st.markdown("""
+            <div class="menu-section">
+                <h3>🥤 Menu Đồ Uống</h3>
+            </div>
+            """, unsafe_allow_html=True)
+
+            st.markdown('<div class="menu-image-container">', unsafe_allow_html=True)
+            st.image(str(menu_drinks_path), use_column_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
+    else:
+        st.info("📷 Hình ảnh menu sẽ được cập nhật sớm")
 
 
 def show_recommendation_interface():
@@ -392,10 +447,10 @@ def display_recommendations(result):
         with st.container():
             st.markdown(f"""
             <div class="combo-card">
-                <h3 style="color: #38BDF8;">#{idx} - {food_emoji} {food.name} + {drink_emoji} {drink.name}</h3>
-                <p style="font-size: 1.1rem; margin-top: 1rem;">
+                <h3>#{idx} - {food_emoji} {food.name} + {drink_emoji} {drink.name}</h3>
+                <p style="font-size: 1rem; margin-top: 1rem;">
                     <span class="price-badge">{int(solution.assignment.get_total_price()):,} VND</span>
-                    <span style="margin: 0 1rem; color: #64748B;">•</span>
+                    <span style="margin: 0 1rem; color: #94A3B8;">•</span>
                     <span class="score-badge">{solution.normalized_score:.1f}/100 điểm</span>
                 </p>
             </div>
