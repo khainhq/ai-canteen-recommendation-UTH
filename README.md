@@ -1,6 +1,12 @@
+<div align="center">
+
+<img src="logo.svg" alt="AI Canteen Logo" width="800"/>
+
 # AI-Powered Canteen Recommendation System
 
 A smart meal recommendation system for university canteens using AI techniques including Constraint Satisfaction Problems (CSP), Backtracking Search, and Heuristic Utility Evaluation.
+
+</div>
 
 ## About
 
@@ -15,6 +21,14 @@ This system helps students find optimal meal combinations based on their prefere
 - Detailed explanation of AI decision-making process
 - Vietnamese language interface
 - Fully responsive design
+- Visual menu gallery with real canteen photos
+
+## Screenshots
+
+<div align="center">
+<img src="assets/menu_food.jpg" alt="Canteen Menu - Food" width="400"/>
+<img src="assets/menu_drinks.jpg" alt="Canteen Menu - Drinks" width="400"/>
+</div>
 
 ## Technologies
 

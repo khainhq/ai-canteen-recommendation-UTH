@@ -7,6 +7,7 @@ Uses Constraint Satisfaction Problem (CSP) + Backtracking Search + Heuristic Uti
 """
 
 import streamlit as st
+from pathlib import Path
 from knowledge_base import KnowledgeBase, MealTime, DietType, Category
 from csp import UserRequest, CSPModel
 from inference_engine import InferenceEngine, format_complete_trace
@@ -24,68 +25,141 @@ st.set_page_config(
 # Custom CSS for better UI
 st.markdown("""
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    * {
+        font-family: 'Inter', sans-serif;
+    }
+
     .main-header {
-        font-size: 2.5rem;
+        font-size: clamp(2rem, 5vw, 2.5rem);
         font-weight: 700;
-        color: #0F172A;
+        color: #0A0D12;
         text-align: center;
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.02em;
     }
     .sub-header {
-        font-size: 1.2rem;
+        font-size: clamp(1rem, 3vw, 1.2rem);
         color: #475569;
         text-align: center;
         margin-bottom: 2rem;
     }
+    .menu-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+    .menu-card {
+        background: #0F131C;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease;
+    }
+    .menu-card:hover {
+        transform: translateY(-4px);
+    }
+    .menu-card img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    .menu-label {
+        padding: 1rem;
+        text-align: center;
+        color: #F8FAFC;
+        font-weight: 600;
+        font-size: 1.1rem;
+        background: linear-gradient(135deg, #161D2B 0%, #0F131C 100%);
+    }
     .combo-card {
-        background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+        background: linear-gradient(135deg, #0F131C 0%, #161D2B 100%);
         padding: 1.5rem;
-        border-radius: 12px;
-        border: 1px solid #334155;
+        border-radius: 16px;
+        border: 1px solid #1E2636;
         margin-bottom: 1rem;
         color: #F8FAFC;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .combo-card h3 {
+        margin-top: 0;
+        letter-spacing: -0.01em;
     }
     .score-badge {
         background: #38BDF8;
-        color: #0F172A;
-        padding: 0.4rem 0.8rem;
-        border-radius: 6px;
+        color: #0A0D12;
+        padding: 0.5rem 1rem;
+        border-radius: 999px;
         font-weight: 700;
         font-size: 1.1rem;
         display: inline-block;
     }
     .price-badge {
-        background: #F97316;
-        color: #F8FAFC;
-        padding: 0.4rem 0.8rem;
-        border-radius: 6px;
+        background: #E9A568;
+        color: #0A0D12;
+        padding: 0.5rem 1rem;
+        border-radius: 999px;
         font-weight: 600;
         display: inline-block;
     }
     .reasoning-box {
-        background: #1E293B;
+        background: #161D2B;
         border-left: 3px solid #38BDF8;
         padding: 1rem;
         margin-top: 1rem;
-        border-radius: 4px;
+        border-radius: 8px;
     }
     .pipeline-step {
-        background: #F1F5F9;
-        padding: 1rem;
-        border-radius: 8px;
+        background: #0F131C;
+        padding: 1.5rem;
+        border-radius: 12px;
         border-left: 4px solid #38BDF8;
         margin-bottom: 1rem;
+        color: #F8FAFC;
+    }
+    .pipeline-step h4 {
+        color: #38BDF8;
+        margin-top: 0;
+    }
+    .pipeline-step ul {
+        color: #E2E8F0;
     }
     .stButton>button {
-        background: #38BDF8;
-        color: #0F172A;
+        background: linear-gradient(135deg, #38BDF8 0%, #22D3EE 100%);
+        color: #0A0D12;
         font-weight: 600;
         border: none;
-        border-radius: 8px;
-        padding: 0.6rem 1.5rem;
+        border-radius: 999px;
+        padding: 0.75rem 2rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
     }
     .stButton>button:hover {
-        background: #22D3EE;
+        background: linear-gradient(135deg, #22D3EE 0%, #38BDF8 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(56, 189, 248, 0.4);
+    }
+    .section-divider {
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #38BDF8, transparent);
+        margin: 2rem 0;
+    }
+    .info-box {
+        background: #0F131C;
+        border: 1px solid #1E2636;
+        border-radius: 12px;
+        padding: 1.5rem;
+        color: #E2E8F0;
+    }
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 1rem;
+    }
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 12px 12px 0 0;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -107,6 +181,27 @@ def main():
     # Header
     st.markdown('<div class="main-header">🍽️ Hệ thống AI gợi ý món ăn</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Căn tin Trường Đại học Giao thông Vận tải TP.HCM</div>', unsafe_allow_html=True)
+
+    # Display real menu images
+    st.markdown("### 📋 Menu Căn tin UTH")
+
+    assets_path = Path(__file__).parent / "assets"
+
+    if assets_path.exists():
+        col1, col2 = st.columns(2)
+
+        menu_food_path = assets_path / "menu_food.jpg"
+        menu_drinks_path = assets_path / "menu_drinks.jpg"
+
+        with col1:
+            if menu_food_path.exists():
+                st.image(str(menu_food_path), caption="Menu Món ăn", use_container_width=True)
+
+        with col2:
+            if menu_drinks_path.exists():
+                st.image(str(menu_drinks_path), caption="Menu Đồ uống", use_container_width=True)
+
+    st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
     # Create tabs
     tab1, tab2, tab3 = st.tabs([
@@ -254,17 +349,53 @@ def display_recommendations(result):
 
     utility_function = st.session_state.inference_engine.utility_function
 
+    # Food emoji mapping for visual appeal
+    food_emojis = {
+        "cơm": "🍚",
+        "mì": "🍜",
+        "bún": "🍜",
+        "phở": "🍜",
+        "bánh mì": "🥖",
+        "default": "🍽️"
+    }
+
+    drink_emojis = {
+        "nước ép": "🧃",
+        "cà phê": "☕",
+        "trà": "🍵",
+        "sữa": "🥛",
+        "nước": "💧",
+        "default": "🥤"
+    }
+
+    def get_food_emoji(food_name):
+        name_lower = food_name.lower()
+        for key, emoji in food_emojis.items():
+            if key in name_lower:
+                return emoji
+        return food_emojis["default"]
+
+    def get_drink_emoji(drink_name):
+        name_lower = drink_name.lower()
+        for key, emoji in drink_emojis.items():
+            if key in name_lower:
+                return emoji
+        return drink_emojis["default"]
+
     for idx, solution in enumerate(result.ranked_solutions, 1):
         food = solution.assignment.food
         drink = solution.assignment.drink
 
+        food_emoji = get_food_emoji(food.name)
+        drink_emoji = get_drink_emoji(drink.name)
+
         with st.container():
             st.markdown(f"""
             <div class="combo-card">
-                <h3 style="color: #38BDF8;">#{idx} - {food.name} + {drink.name}</h3>
-                <p style="font-size: 1.1rem; margin-top: 0.5rem;">
+                <h3 style="color: #38BDF8;">#{idx} - {food_emoji} {food.name} + {drink_emoji} {drink.name}</h3>
+                <p style="font-size: 1.1rem; margin-top: 1rem;">
                     <span class="price-badge">{int(solution.assignment.get_total_price()):,} VND</span>
-                    <span style="margin: 0 1rem;">•</span>
+                    <span style="margin: 0 1rem; color: #64748B;">•</span>
                     <span class="score-badge">{solution.normalized_score:.1f}/100 điểm</span>
                 </p>
             </div>
@@ -345,7 +476,7 @@ def show_ai_explanation():
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("---")
+    st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
     st.markdown("""
     ### 🔧 PIPELINE - Các bước xử lý của f:
@@ -371,7 +502,7 @@ def show_ai_explanation():
     ```
     """)
 
-    st.markdown("---")
+    st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
     st.markdown("""
     ### 🧩 Module 1: Knowledge Base (Cơ sở tri thức)
@@ -399,7 +530,7 @@ def show_ai_explanation():
         col2.metric("Tổng số đồ uống", total_drinks)
         col3.metric("Không gian tìm kiếm", f"{total_dishes * total_drinks:,} combos")
 
-    st.markdown("---")
+    st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
     # Module 2: CSP
     st.markdown("""
@@ -436,7 +567,7 @@ def show_ai_explanation():
     → Giảm không gian tìm kiếm, tăng hiệu quả
     """)
 
-    st.markdown("---")
+    st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
     # Module 3: Backtracking Search
     st.markdown("""
@@ -478,7 +609,7 @@ def show_ai_explanation():
     - Solutions found (số nghiệm tìm được)
     """)
 
-    st.markdown("---")
+    st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
     # Module 4: Utility Evaluation
     st.markdown("""
@@ -503,9 +634,11 @@ def show_ai_explanation():
     → Xếp hạng theo điểm số: **f(X) = argmax U(s, X)**
     """)
 
-    st.markdown("---")
+    st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
-    st.info("""
+    st.markdown("""
+    <div class="info-box">
+
     ### 🎓 Tại sao đây là AI?
 
     #### ✅ Thuật toán AI được sử dụng:
@@ -534,7 +667,9 @@ def show_ai_explanation():
     - Demo được backtracking trên 1 ví dụ nhỏ
     - Giải thích công thức U(s, X) bằng tay
     - Chứng minh f(X) = argmax U(s, X)
-    """)
+
+    </div>
+    """, unsafe_allow_html=True)
 
 
 def show_advanced_settings():
@@ -610,7 +745,7 @@ def show_advanced_settings():
         }
         st.success("✅ Đã cập nhật trọng số! Thử tìm kiếm lại ở Tab 1 để xem sự khác biệt.")
 
-    st.markdown("---")
+    st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
     st.markdown("""
     ### 📊 Công thức Utility hiện tại:
