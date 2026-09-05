@@ -1,0 +1,85 @@
+/* Local system fonts keep the interface fast and readable without web fonts. */
+.stApp {
+    background: #fafbf7;
+    color: #293e36;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+[data-testid="stHeader"] { background: #fafbf7; }
+.block-container { max-width: 1080px; padding-top: 4.5rem; padding-bottom: 2rem; }
+h1, h2, h3 { color: #293e36; letter-spacing: -0.025em; }
+h2 { font-size: 1.5rem !important; }
+h3 { font-size: 1.12rem !important; }
+.hero-header {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    background: linear-gradient(110deg, #e7f3e9, #f5f5e8 70%, #fff0df);
+    border: 1px solid #dbe7d8; border-radius: 24px;
+    padding: 1.8rem 2rem; margin-bottom: 1.25rem;
+}
+.eyebrow { color: #486354; font-size: .76rem; font-weight: 700; letter-spacing: .12em; }
+.hero-header h1 { font-size: clamp(1.7rem, 4vw, 2.4rem); padding: .35rem 0; margin: 0; }
+.hero-header p { color: #52675b; margin: .35rem 0 0; font-size: .98rem; }
+.hero-sticker {
+    flex-shrink: 0; width: 100px; height: 100px; display: grid; place-items: center;
+    background: #fffdf5; border: 2px solid #fff; border-radius: 30px;
+    font-size: 3.2rem; transform: rotate(8deg); box-shadow: 0 6px 0 #dce8d9;
+}
+.stTabs [data-baseweb="tab-list"] { gap: .35rem; border-bottom: 1px solid #dce5db; }
+.stTabs [data-baseweb="tab"] {
+    height: 46px; padding: .5rem 1rem; border-radius: 12px 12px 0 0;
+    color: #52675b; white-space: nowrap;
+}
+.stTabs [data-baseweb="tab"][aria-selected="true"] { background: #e6f1e8; color: #246346; }
+.stTabs [data-baseweb="tab-highlight"] { background: #39815d; }
+.stTabs [data-baseweb="tab-panel"] { padding-top: 1.4rem; }
+[data-testid="stForm"] { background: #fff; border: 1px solid #dce5db; border-radius: 20px; padding: 1.4rem; }
+[data-testid="stFormSubmitButton"] button, .stButton > button[kind="primary"] {
+    background: #327653; color: white; border: 1px solid #327653;
+    border-radius: 12px; min-height: 46px; font-weight: 600;
+}
+[data-testid="stFormSubmitButton"] button:hover, .stButton > button[kind="primary"]:hover {
+    background: #245d40; color: white; border-color: #245d40;
+}
+button:focus-visible, a:focus-visible { outline: 3px solid #bd7435 !important; outline-offset: 3px; }
+[data-testid="stExpander"] { background: #fff; border-radius: 14px; border-color: #dce5db; }
+.quick-guide {
+    display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin: 0 0 1rem;
+    color: #52675b; font-size: .88rem;
+}
+.quick-guide b { color: #327653; }
+.guide-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0; }
+.guide-card { background: #fff; border: 1px solid #dce5db; border-radius: 18px; padding: 1.25rem; }
+.guide-card:nth-child(2) { background: #fff4e9; border-color: #f0dfcd; }
+.guide-card:nth-child(3) { background: #edf4eb; }
+.guide-card .step { font-size: .78rem; font-weight: 700; color: #52675b; }
+.guide-card h3 { padding: .5rem 0; }
+.guide-card p { color: #52675b; font-size: .92rem; margin: 0; line-height: 1.65; }
+.menu-preview { margin: .4rem auto 1rem; text-align: center; }
+.menu-preview img {
+    display: block; width: auto; max-width: 100%; height: 270px; object-fit: contain;
+    margin: auto; border-radius: 12px; border: 1px solid #dce5db;
+}
+.menu-preview figcaption { color: #52675b; font-size: .8rem; margin-top: .6rem; }
+.combo-card {
+    background: #fff; padding: 1.2rem 1.4rem; border-radius: 18px;
+    border: 1px solid #dce5db; margin: .6rem 0; color: #293e36;
+}
+.combo-card.best { background: #eef6ed; border-color: #9fc4a5; }
+.combo-card h3 { margin: .5rem 0 .8rem; padding: 0; line-height: 1.5; }
+.combo-rank { color: #37714e; font-size: .8rem; font-weight: 700; }
+.combo-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+.price-badge, .score-badge { padding: .35rem .7rem; border-radius: 9px; font-size: .88rem; font-weight: 600; }
+.price-badge { background: #fff0dd; color: #815123; }
+.score-badge { background: #e5eee5; color: #315f43; }
+.pipeline-step, .info-box { background: #f0f5ee; padding: 1.2rem; border-radius: 14px; }
+.section-divider { border-top: 1px solid #dce5db; margin: 1.5rem 0; }
+.footer-note { color: #657568; text-align: center; font-size: .78rem; margin-top: 2rem; }
+@media (max-width: 640px) {
+    .block-container { padding: 4.5rem 1rem 1rem; }
+    .hero-header { padding: 1.2rem; border-radius: 18px; }
+    .hero-sticker { width: 60px; height: 66px; font-size: 2rem; border-radius: 20px; }
+    .hero-header p { font-size: .86rem; }
+    .stTabs [data-baseweb="tab"] { padding: .5rem .6rem; }
+    .guide-grid { grid-template-columns: 1fr; }
+    [data-testid="stForm"] { padding: 1rem; }
+    .menu-preview img { height: auto; max-height: 250px; }
+}
