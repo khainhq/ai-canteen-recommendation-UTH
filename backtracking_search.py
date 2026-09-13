@@ -4,7 +4,7 @@ Implements recursive backtracking algorithm for CSP solution finding.
 Searches the assignment space systematically with constraint checking and backtracking.
 """
 
-from typing import List, Dict, Optional, Callable
+from typing import List, Dict, Optional, Callable, Tuple
 from dataclasses import dataclass, field
 from csp import CSPModel, Assignment, UserRequest, CSPVariable
 from knowledge_base import MenuItem
@@ -69,7 +69,7 @@ class BacktrackingSearch:
     def search(self,
               domains: Dict[CSPVariable, List[MenuItem]],
               request: UserRequest,
-              max_solutions: int = 100) -> Tuple[List[Assignment], SearchMetrics]:
+              max_solutions: Optional[int] = None) -> Tuple[List[Assignment], SearchMetrics]:
         """
         Main entry point for backtracking search.
 
@@ -104,7 +104,7 @@ class BacktrackingSearch:
             self.metrics.solutions_found += 1
 
             # Continue searching for more solutions (don't return True)
-            if len(self.solutions) >= self.max_solutions:
+            if self.max_solutions is not None and len(self.solutions) >= self.max_solutions:
                 return True  # Stop when max solutions reached
             return False
 
@@ -186,10 +186,11 @@ class SearchResult:
             def __init__(self, stats_dict):
                 self.initial_food_domain = stats_dict['initial_food_count']
                 self.initial_drink_domain = stats_dict['initial_drink_count']
-                self.after_time_filter = stats_dict['final_food_count']  # approximation
-                self.after_diet_filter = stats_dict['final_food_count']
-                self.after_budget_filter = stats_dict['final_food_count']
-                self.after_addon_filter = stats_dict['final_food_count']
+                self.after_time_filter = self.initial_food_domain - stats_dict['removed_by_meal_time']
+                self.after_diet_filter = self.after_time_filter - stats_dict['removed_by_diet']
+                self.after_budget_filter = self.after_diet_filter - stats_dict['removed_by_budget']
+                self.after_addon_filter = self.after_budget_filter - stats_dict['removed_by_addon']
+                self.after_selection_filter = stats_dict['final_food_count']
                 self.after_drink_filter = stats_dict['final_drink_count']
 
         self.propagation_stats = PropagationStats(propagation_stats)
@@ -262,7 +263,7 @@ class SearchResult:
 
 def solve_csp(csp_model: CSPModel,
              request: UserRequest,
-             max_solutions: int = 100) -> SearchResult:
+             max_solutions: Optional[int] = None) -> SearchResult:
     """
     Complete CSP solving pipeline:
     1. Get initial domains

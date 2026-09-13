@@ -73,6 +73,35 @@ button:focus-visible, a:focus-visible { outline: 3px solid #bd7435 !important; o
 .pipeline-step, .info-box { background: #f0f5ee; padding: 1.2rem; border-radius: 14px; }
 .section-divider { border-top: 1px solid #dce5db; margin: 1.5rem 0; }
 .footer-note { color: #657568; text-align: center; font-size: .78rem; margin-top: 2rem; }
+/* The central column stays 1080px wide; menus occupy only its outer margins. */
+.side-menu {
+    position: fixed;
+    top: 9rem;
+    width: calc((100vw - 1080px) / 2 - 48px);
+    max-height: calc(100vh - 11rem);
+    padding: 1rem;
+    box-sizing: border-box;
+    background: #fffdf8;
+    border: 1px solid #dce5db;
+    border-radius: 20px;
+    box-shadow: 0 8px 28px rgba(41, 62, 54, .07);
+    text-align: center;
+    overflow: auto;
+}
+.side-menu-left { left: 24px; }
+.side-menu-right { right: 24px; }
+.side-menu-title { color: #327653; font-size: 1.1rem; font-weight: 700; margin-bottom: .85rem; }
+.side-menu img {
+    display: block;
+    width: 100%;
+    max-height: calc(100vh - 19rem);
+    object-fit: contain;
+    border-radius: 10px;
+}
+.side-menu p { color: #657568; font-size: .78rem; margin: .85rem 0 0; }
+@media (max-width: 1500px) {
+    .side-menu { display: none; }
+}
 @media (max-width: 640px) {
     .block-container { padding: 4.5rem 1rem 1rem; }
     .hero-header { padding: 1.2rem; border-radius: 18px; }

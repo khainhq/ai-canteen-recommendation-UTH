@@ -75,13 +75,13 @@ class KnowledgeBase:
 
         if any(kw in name_lower for kw in ["cơm", "rice"]):
             return Category.COM
-        elif any(kw in name_lower for kw in ["mì", "bún", "phở", "hủ tiếu", "bánh canh", "nui"]):
-            return Category.MI_BUN_PHO
         elif "bánh mì" in name_lower:
             return Category.BANH_MI
+        elif any(kw in name_lower for kw in ["mì", "bún", "phở", "hủ tiếu", "bánh canh", "nui", "hảo hảo"]):
+            return Category.MI_BUN_PHO
         elif any(kw in name_lower for kw in ["táo", "bưởi", "cà rốt", "thơm", "chanh", "dưa", "cam", "cóc", "ổi"]):
             return Category.NUOC_EP
-        elif "café" in name_lower or "coffee" in name_lower:
+        elif any(kw in name_lower for kw in ["café", "cafe", "coffee", "cà phê", "bạc xỉu"]):
             return Category.CA_PHE
         elif "trà" in name_lower:
             return Category.TRA_SUA
@@ -221,7 +221,7 @@ class KnowledgeBase:
                 name=item["name"],
                 price=item["price"],
                 price_max=item.get("price_max"),
-                category=Category.TRA_SUA,
+                category=Category.TRA_SUA if "trà sữa" in item["name"].lower() else Category.KHAC,
                 diet=DietType.BOTH,
                 meal_time=MealTime.BREAKFAST,
                 calories_estimate=80

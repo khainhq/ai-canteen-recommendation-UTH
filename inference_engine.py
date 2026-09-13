@@ -85,7 +85,7 @@ class InferenceEngine:
         search_result = solve_csp(
             self.csp_model,
             request,
-            max_solutions=100
+            max_solutions=None
         )
 
         # Step 5: Utility Evaluation and Ranking
@@ -147,7 +147,7 @@ def format_complete_trace(result: RecommendationResult) -> str:
     trace += f"**Initial Domains:**\n"
     trace += f"- D_Food: {result.search_result.propagation_stats.initial_food_domain} món\n"
     trace += f"- D_Drink: {result.search_result.propagation_stats.initial_drink_domain} đồ uống\n"
-    trace += f"- Search space: {result.search_result.propagation_stats.initial_food_domain * result.search_result.propagation_stats.initial_drink_domain:,} tổ hợp\n\n"
+    trace += f"- Search space: {result.search_result.propagation_stats.initial_food_domain * (result.search_result.propagation_stats.initial_drink_domain if result.request.wants_drink else 1):,} tổ hợp\n\n"
 
     trace += "---\n\n"
     trace += "## BƯỚC 3: CONSTRAINT PROPAGATION\n\n"
@@ -157,7 +157,8 @@ def format_complete_trace(result: RecommendationResult) -> str:
     trace += f"- Sau lọc budget: {result.search_result.propagation_stats.after_budget_filter} món ăn\n"
     trace += f"- Sau lọc add-on: {result.search_result.propagation_stats.after_addon_filter} món ăn\n"
     trace += f"- Sau lọc caffeine/drink: {result.search_result.propagation_stats.after_drink_filter} đồ uống\n\n"
-    trace += f"**Reduced search space:** {result.search_result.propagation_stats.after_addon_filter * result.search_result.propagation_stats.after_drink_filter:,} tổ hợp\n\n"
+    trace += f"- Sau lọc nhóm món: {result.search_result.propagation_stats.after_selection_filter} món ăn\n"
+    trace += f"**Reduced search space:** {result.search_result.propagation_stats.after_selection_filter * (result.search_result.propagation_stats.after_drink_filter if result.request.wants_drink else 1):,} tổ hợp\n\n"
 
     trace += "---\n\n"
     trace += "## BƯỚC 4: BACKTRACKING SEARCH\n\n"
@@ -177,7 +178,7 @@ def format_complete_trace(result: RecommendationResult) -> str:
     if result.ranked_solutions:
         trace += f"**Top 3 nghiệm có utility cao nhất:**\n\n"
         for idx, sol in enumerate(result.ranked_solutions[:3], 1):
-            trace += f"{idx}. {sol.assignment.food.name} + {sol.assignment.drink.name}\n"
+            trace += f"{idx}. {sol.assignment.food.name}{' + ' + sol.assignment.drink.name if sol.assignment.drink else ''}\n"
             trace += f"   - Raw score: {sol.raw_score:.2f}\n"
             trace += f"   - Normalized: {sol.normalized_score:.1f}/100\n"
             trace += f"   - Price: {sol.assignment.get_total_price():,} VND\n\n"
@@ -189,7 +190,7 @@ def format_complete_trace(result: RecommendationResult) -> str:
         best = result.ranked_solutions[0]
         trace += f"**f(X) = argmax U(s, X):**\n\n"
         trace += f"```\n"
-        trace += f"f(X) = {best.assignment.food.name} + {best.assignment.drink.name}\n"
+        trace += f"f(X) = {best.assignment.food.name}{' + ' + best.assignment.drink.name if best.assignment.drink else ''}\n"
         trace += f"U(s, X) = {best.normalized_score:.1f}/100\n"
         trace += f"Price = {best.assignment.get_total_price():,} VND\n"
         trace += f"```\n\n"

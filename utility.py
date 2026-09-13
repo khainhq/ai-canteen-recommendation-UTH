@@ -48,10 +48,10 @@ class UtilityFunction:
     def __init__(self):
         # Default weights for utility criteria
         self.weights = {
-            "budget_fit": 0.30,        # How well price uses available budget
-            "preference_match": 0.25,   # Match to taste preferences
-            "variety_bonus": 0.20,      # Bonus for balanced food-drink pairing
+            "preference_match": 0.40,   # Match to taste preferences (highest priority)
+            "budget_fit": 0.25,        # How well price uses available budget
             "hunger_fit": 0.15,         # Match to hunger level
+            "variety_bonus": 0.10,      # Bonus for balanced food-drink pairing
             "thirst_fit": 0.10          # Match to thirst level
         }
 
@@ -162,24 +162,46 @@ class UtilityFunction:
         }
 
         preferred_categories = [
-            pref_map[p] for p in taste_preferences if p in pref_map
+            pref_map[p.strip().lower()] for p in taste_preferences if p.strip().lower() in pref_map
         ]
 
-        matches = []
-        if assignment.food and assignment.food.category in preferred_categories:
-            matches.append(assignment.food.category.value)
-        if assignment.drink and assignment.drink.category in preferred_categories:
-            matches.append(assignment.drink.category.value)
+        # Separate food and drink preferences
+        food_prefs = [Category.COM, Category.MI_BUN_PHO, Category.BANH_MI]
+        drink_prefs = [Category.NUOC_EP, Category.CA_PHE, Category.TRA_SUA]
 
-        if len(matches) == 2:
+        preferred_foods = [c for c in preferred_categories if c in food_prefs]
+        preferred_drinks = [c for c in preferred_categories if c in drink_prefs] if assignment.drink else []
+
+        matches = []
+        match_count = 0
+
+        # Check food match
+        if preferred_foods and assignment.food:
+            if assignment.food.category in preferred_foods:
+                matches.append(f"món ăn {assignment.food.category.value}")
+                match_count += 1
+
+        # Check drink match
+        if preferred_drinks and assignment.drink:
+            if assignment.drink.category in preferred_drinks:
+                matches.append(f"đồ uống {assignment.drink.category.value}")
+                match_count += 1
+
+        # Calculate score based on matches
+        if match_count == 2:
             score = 1.0
             reason = f"Cả món ăn và đồ uống đều khớp sở thích: {', '.join(matches)}"
-        elif len(matches) == 1:
-            score = 0.7
-            reason = f"Khớp sở thích: {matches[0]}"
+        elif match_count == 1:
+            score = 1.0 if not (preferred_foods and preferred_drinks) else 0.5
+            reason = f"Khớp sở thích: {', '.join(matches)}"
+        elif not preferred_foods and not preferred_drinks:
+            # User selected preferences but not in food/drink categories
+            score = 0.5
+            reason = "Không có sở thích món ăn/đồ uống cụ thể"
         else:
-            score = 0.3
-            reason = "Không khớp sở thích đã chọn"
+            # Has preferences but didn't match
+            score = 0.2
+            reason = "Không khớp với sở thích đã chọn"
 
         return score, reason
 
@@ -276,10 +298,13 @@ class UtilityFunction:
         drink_price = drink.price
 
         if is_thirsty:
-            # When thirsty, prefer refreshing drinks
+            # When thirsty, prefer refreshing drinks (juice, milk tea)
             if drink.category in [Category.NUOC_EP, Category.TRA_SUA]:
                 score = 1.0
                 reason = f"Đồ uống giải khát tốt: {drink.name}"
+            elif drink.category == Category.CA_PHE:
+                score = 0.6
+                reason = f"Cà phê khi khát nước"
             elif drink_price <= 15000:
                 score = 0.5
                 reason = "Đồ uống cơ bản khi khát nước"
@@ -287,13 +312,14 @@ class UtilityFunction:
                 score = 0.7
                 reason = f"Đồ uống: {drink.name}"
         else:
-            # When not thirsty, simple/cheap drinks are fine
+            # When not thirsty, ALL drinks are acceptable (coffee, juice, tea, etc.)
+            # Don't penalize any drink type when user is not thirsty
             if drink_price <= 15000:
                 score = 1.0
-                reason = f"Đồ uống đơn giản ({int(drink_price):,}đ) khi không khát"
+                reason = f"Đồ uống đơn giản ({int(drink_price):,}đ)"
             else:
-                score = 0.6
-                reason = f"Đồ uống cao cấp khi không quá khát"
+                score = 0.9
+                reason = f"Đồ uống {drink.name} ({int(drink_price):,}đ)"
 
         return score, reason
 
@@ -304,7 +330,7 @@ class UtilityFunction:
         criteria_names = {
             "budget_fit": "Phù hợp giá",
             "preference_match": "Khớp sở thích",
-            "variety_bonus": "Cân bằng dinh dưỡng",
+            "variety_bonus": "Kết hợp món",
             "hunger_fit": "Phù hợp mức đói",
             "thirst_fit": "Phù hợp mức khát"
         }

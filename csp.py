@@ -39,6 +39,13 @@ class UserRequest:
     is_thirsty: bool = True
     caffeine_allowed: bool = True
 
+    def selected_categories(self, drinks: bool = False) -> Set[Category]:
+        """Selected groups are OR within food/drinks, AND across both."""
+        allowed = ({Category.NUOC_EP, Category.CA_PHE, Category.TRA_SUA, Category.KHAC}
+                   if drinks else {Category.COM, Category.MI_BUN_PHO, Category.BANH_MI})
+        return {c for c in allowed
+                if c.value in {p.strip().lower() for p in self.taste_preferences}}
+
     def to_dict(self) -> Dict:
         """Convert to dictionary for display"""
         return {
@@ -208,6 +215,22 @@ class PrimaryItemConstraint(Constraint):
         return True
 
 
+class SelectionConstraint(Constraint):
+    """Explicit selections cannot be overridden by utility scores."""
+
+    def __init__(self):
+        super().__init__("C6", "Chỉ chọn đúng nhóm món; không thêm nước khi không yêu cầu")
+
+    def is_satisfied(self, assignment: Assignment, request: UserRequest) -> bool:
+        if assignment.drink and not request.wants_drink:
+            return False
+        for item, groups in [(assignment.food, request.selected_categories()),
+                             (assignment.drink, request.selected_categories(drinks=True))]:
+            if item and groups and item.category not in groups:
+                return False
+        return True
+
+
 class CSPModel:
     """
     Formal CSP representation of the meal recommendation problem
@@ -229,7 +252,8 @@ class CSPModel:
             MealTimeConstraint(),
             VegetarianConstraint(),
             CaffeineConstraint(),
-            PrimaryItemConstraint()
+            PrimaryItemConstraint(),
+            SelectionConstraint()
         ]
 
     def get_initial_domains(self, request: UserRequest) -> Dict[CSPVariable, List[MenuItem]]:
@@ -303,6 +327,15 @@ class CSPModel:
             drink_domain = [d for d in drink_domain if d.category != Category.CA_PHE]
             stats["removed_by_caffeine"] = before_caffeine - len(drink_domain)
 
+        selection = SelectionConstraint()
+        before_food, before_drink = len(food_domain), len(drink_domain)
+        food_domain = [f for f in food_domain
+                       if selection.is_satisfied(Assignment(food=f), request)]
+        drink_domain = [d for d in drink_domain
+                        if d.price <= request.budget
+                        and selection.is_satisfied(Assignment(drink=d), request)]
+        stats["removed_by_selection_food"] = before_food - len(food_domain)
+        stats["removed_by_selection_drink"] = before_drink - len(drink_domain)
         stats["final_food_count"] = len(food_domain)
         stats["final_drink_count"] = len(drink_domain)
 

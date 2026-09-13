@@ -20,6 +20,11 @@ class StudentInterfaceTests(unittest.TestCase):
                          ["🍽️ Chọn món", "📋 Menu căn tin", "🌷 Hướng dẫn"])
         previews = [m.value for m in self.app.markdown if 'class="menu-preview"' in m.value]
         self.assertEqual(len(previews), 2)
+        side_menus = [m.value for m in self.app.markdown if '<aside class="side-menu ' in m.value]
+        self.assertEqual(len(side_menus), 2)
+        self.assertIn('side-menu-left', side_menus[0])
+        self.assertIn('side-menu-right', side_menus[1])
+        self.assertTrue(all('data:image/jpeg;base64,' in menu for menu in side_menus))
         self.assertTrue(all("data:image/jpeg;base64," in p for p in previews))
         self.assertTrue(any("BƯỚC 03" in m.value for m in self.app.markdown))
 
@@ -45,6 +50,18 @@ class StudentInterfaceTests(unittest.TestCase):
         self.assertTrue(all(s.assignment.get_total_price() <= 35000
                             for s in result.ranked_solutions))
 
+    def test_no_drink_and_strict_noodles(self):
+        self.app.checkbox[0].uncheck()
+        self.app.multiselect[0].set_value(["Mì/Bún/Phở", "Nước ép"])
+        self.submit_meal()
+        self.assert_no_errors()
+        result = self.app.session_state["last_result"]
+        self.assertTrue(result.ranked_solutions)
+        for score in result.ranked_solutions:
+            self.assertIsNone(score.assignment.drink)
+            self.assertEqual(score.assignment.food.category.value, "mì/bún/phở")
+            self.assertNotIn("Bánh mì", score.assignment.food.name)
+
     def test_weight_validation_and_reset(self):
         for slider in self.app.slider:
             if slider.key and slider.key.startswith("weight_"):
@@ -54,7 +71,7 @@ class StudentInterfaceTests(unittest.TestCase):
         self.assertTrue(self.app.error)
         next(b for b in self.app.button if b.label == "Khôi phục mặc định").click().run()
         self.assert_no_errors()
-        self.assertEqual(self.app.slider(key="weight_budget_fit").value, 30)
+        self.assertEqual(self.app.slider(key="weight_budget_fit").value, 25)
         self.app.slider(key="weight_budget_fit").set_value(100)
         next(b for b in self.app.button if b.label == "Lưu mức ưu tiên").click().run()
         self.assert_no_errors()

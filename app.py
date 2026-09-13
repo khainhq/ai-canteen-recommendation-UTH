@@ -26,6 +26,10 @@ st.markdown(
 
 def initialize_system():
     """Initialize the existing AI components once per session."""
+    if st.session_state.get("logic_version") != 2:
+        for key in ("kb", "inference_engine", "csp_model", "last_result", "result_summary"):
+            st.session_state.pop(key, None)
+        st.session_state.logic_version = 2
     if "kb" not in st.session_state:
         st.session_state.kb = KnowledgeBase()
     if "inference_engine" not in st.session_state:
@@ -36,6 +40,7 @@ def initialize_system():
 
 def main():
     initialize_system()
+    show_side_menus()
     st.markdown("""
     <div class="hero-header">
         <div>
@@ -70,6 +75,25 @@ def main():
 def menu_image_data(path_string, modified_time):
     """Cache image encoding; invalidate it when a menu photo changes."""
     return b64encode(Path(path_string).read_bytes()).decode("ascii")
+
+
+def show_side_menus():
+    """Fill wide-screen margins without reducing the recommendation form."""
+    for side, filename, title in [
+        ("left", "menu_food.jpg", "🍚 Menu món ăn"),
+        ("right", "menu_drinks.jpg", "🥤 Menu đồ uống"),
+    ]:
+        path = ASSETS_PATH / filename
+        if not path.is_file():
+            continue
+        image_data = menu_image_data(str(path), path.stat().st_mtime_ns)
+        st.markdown(f"""
+        <aside class="side-menu side-menu-{side}" aria-label="{title}">
+            <div class="side-menu-title">{title}</div>
+            <img src="data:image/jpeg;base64,{image_data}" alt="{title} căn tin UTH">
+            <p>Xem ảnh phóng to trong tab 📋 Menu căn tin</p>
+        </aside>
+        """, unsafe_allow_html=True)
 
 
 def show_menu_gallery():
@@ -112,7 +136,7 @@ def show_usage_guide():
         <article class="guide-card">
             <div class="step">BƯỚC 02 · THÊM CHÚT GU</div>
             <h3>😋 Bạn đang thèm gì?</h3>
-            <p>Chọn mức độ đói, đánh dấu nếu đang khát và thêm nhóm món yêu thích. Chưa biết ăn gì? Cứ để trống sở thích nhé.</p>
+            <p>Chọn mức độ đói, đánh dấu nếu muốn thêm đồ uống và chọn nhóm món muốn tìm. Chưa biết ăn gì? Cứ để trống sở thích nhé.</p>
         </article>
         <article class="guide-card">
             <div class="step">BƯỚC 03 · NHẬN GỢI Ý</div>
@@ -126,7 +150,7 @@ def show_usage_guide():
         st.write("Thử tăng ngân sách từng 5.000đ hoặc kiểm tra lại bữa ăn đã chọn. Hệ thống chỉ gợi ý combo đáp ứng ngân sách, thời điểm và chế độ ăn; không tự bỏ qua các điều kiện này.")
     with st.expander("Điểm phù hợp có ý nghĩa gì?"):
         st.write("Điểm dùng để so sánh các combo theo giá, sở thích, sự kết hợp món, mức đói và mức khát. Điểm cao hơn là phù hợp hơn với tiêu chí đã chọn, không phải đánh giá chất lượng món hay tư vấn dinh dưỡng.")
-        st.caption("Mỗi combo gồm một món ăn và một đồ uống. Sở thích là tiêu chí ưu tiên, không phải điều kiện bắt buộc.")
+        st.caption("Mỗi bữa gồm một món ăn, kèm đồ uống chỉ khi tích chọn. Nhóm đã chọn là điều kiện bắt buộc; nhiều nhóm cùng loại được hiểu là hoặc. Nhóm đồ uống được bỏ qua khi không chọn thêm nước.")
     with st.expander("Làm sao xem menu và đổi lựa chọn?"):
         st.write("Vào Menu căn tin và mở “Xem rõ menu” bên dưới mỗi ảnh. Để đổi combo, quay lại Chọn món, sửa thông tin và nhấn nút gợi ý lần nữa. Kết quả cũ vẫn được giữ cho đến lần tìm tiếp theo.")
         st.caption("Ứng dụng chỉ hỗ trợ gợi ý, chưa có chức năng đặt món hoặc thanh toán. Nếu có dị ứng thực phẩm, hãy xác nhận thành phần trực tiếp với căn tin.")
@@ -147,7 +171,7 @@ def show_recommendation_interface():
             budget = st.slider(
                 "💰 Ngân sách cho cả bữa (đ)", min_value=20000,
                 max_value=100000, value=50000, step=5000,
-                help="Tổng tiền cho một món ăn và một đồ uống.",
+                help="Tổng tiền món ăn và đồ uống (nếu chọn thêm). Giá có khoảng được tính theo mức thấp nhất trên menu.",
             )
             meal_time_display = st.radio(
                 "⏰ Bạn ăn bữa nào?", ["Sáng (trước 10:00)", "Trưa (sau 10:00)"],
@@ -160,15 +184,24 @@ def show_recommendation_interface():
                 value="normal", format_func=lambda value: {
                     "light": "Đói nhẹ", "normal": "Vừa vừa", "very_hungry": "Đói lắm",
                 }[value],
+                help="Đói nhẹ: muốn ăn ít hoặc ăn lót dạ. Vừa vừa: muốn một bữa ăn thông thường. Đói lắm: muốn món no lâu hơn. Đây là nhu cầu do bạn tự chọn, không phải đánh giá sức khỏe.",
             )
-            is_thirsty = st.checkbox("💧 Mình đang khát nước", value=True)
+            st.caption(
+                "🍽️ Đói nhẹ: ăn ít, lót dạ · Vừa vừa: ăn một bữa thông thường · "
+                "Đói lắm: muốn ăn no hơn."
+            )
+            st.caption(
+                "Mức đói chỉ giúp xếp hạng món theo năng lượng ước lượng; "
+                "không tự tăng khẩu phần, thêm món hay vượt ngân sách."
+            )
+            is_thirsty = st.checkbox("💧 Thêm đồ uống vào bữa ăn", value=True)
             taste_labels = st.multiselect(
-                "🍜 Món bạn thích (không bắt buộc)",
+                "🍜 Nhóm món muốn tìm (không bắt buộc)",
                 ["Cơm", "Mì/Bún/Phở", "Bánh mì", "Nước ép", "Cà phê", "Trà sữa"],
                 placeholder="Chọn món bạn thích…",
-                help="Có thể chọn nhiều nhóm món hoặc để trống để khám phá.",
+                help="Chỉ tìm trong nhóm đã chọn. Nhiều nhóm cùng loại là hoặc; để trống để tìm tất cả. Nhóm đồ uống chỉ áp dụng khi tích thêm đồ uống.",
             )
-        st.caption("🍃 Mỗi gợi ý gồm món ăn + đồ uống, trong ngân sách bạn chọn.")
+        st.caption("🍃 Bỏ tích đồ uống → chỉ món ăn. Chọn nhóm món → chỉ tìm đúng nhóm đó, trong ngân sách.")
         submitted = st.form_submit_button("✨ Gợi ý bữa ăn cho mình", use_container_width=True)
 
     if submitted:
@@ -180,7 +213,9 @@ def show_recommendation_interface():
                 [label.lower() for label in taste_labels],
             )
         st.session_state.result_summary = (
-            f"Ngân sách {budget:,.0f}đ · {meal_time_display} · {diet_display}"
+            f"Ngân sách {budget:,.0f}đ · {meal_time_display} · {diet_display} · "
+            f"{'Có đồ uống' if is_thirsty else 'Không đồ uống'} · "
+            f"Nhóm: {', '.join(taste_labels) or 'Tất cả'}"
         )
     if "last_result" in st.session_state:
         st.caption("Lần tìm gần nhất: " + st.session_state.get("result_summary", ""))
@@ -194,7 +229,7 @@ def get_recommendations(budget, meal_time, diet, hunger_level, is_thirsty, taste
     request = UserRequest(
         budget=budget, meal_time=meal_time, vegetarian=(diet == DietType.CHAY),
         hunger_level=hunger_level, taste_preferences=taste_prefs,
-        wants_drink=True, is_thirsty=is_thirsty, caffeine_allowed=True,
+        wants_drink=is_thirsty, is_thirsty=is_thirsty, caffeine_allowed=True,
     )
     result = st.session_state.inference_engine.recommend(request, top_k=5)
     st.session_state.last_result = result
@@ -203,7 +238,7 @@ def get_recommendations(budget, meal_time, diet, hunger_level, is_thirsty, taste
 
 def display_recommendations(result):
     if not result.ranked_solutions:
-        st.warning("Chưa có combo phù hợp 🌱 Thử tăng ngân sách hoặc kiểm tra lại bữa ăn và chế độ ăn nhé.")
+        st.warning("Chưa có bữa ăn đáp ứng đủ điều kiện 🌱 Hãy kiểm tra nhóm món, bữa ăn, chế độ ăn và ngân sách. Hệ thống không tự đổi nhóm món hoặc thêm nước.")
         return
     st.subheader(f"Dành cho bạn · {len(result.ranked_solutions)} combo hợp gu")
     utility_function = st.session_state.inference_engine.utility_function
@@ -215,7 +250,7 @@ def display_recommendations(result):
         st.markdown(f"""
         <article class="{card_class}">
             <div class="combo-rank">{rank_label}</div>
-            <h3>{escape(food.name)} + {escape(drink.name)}</h3>
+            <h3>{escape(food.name)}{' + ' + escape(drink.name) if drink else ''}</h3>
             <div class="combo-meta">
                 <span class="price-badge">{int(solution.assignment.get_total_price()):,}đ / combo</span>
                 <span class="score-badge">★ {solution.normalized_score:.1f}/100 điểm phù hợp</span>
@@ -236,7 +271,7 @@ def show_ai_explanation():
     **AI chọn món như thế nào?**
 
     1. **Đọc menu:** lấy món ăn, đồ uống, giá và thông tin từ cơ sở tri thức.
-    2. **Lọc điều kiện bắt buộc (CSP):** ngân sách, bữa ăn, chế độ ăn và các ràng buộc của hệ thống.
+    2. **Lọc điều kiện bắt buộc (CSP):** ngân sách, bữa ăn, chế độ ăn, nhóm món đã chọn và yêu cầu có/không đồ uống.
     3. **Tìm combo bằng Backtracking:** thử các cách kết hợp hợp lệ, quay lui khi vi phạm điều kiện.
     4. **Chấm điểm Utility:** đánh giá giá tiền, sở thích, sự kết hợp món, mức đói và mức khát.
     5. **Xếp hạng:** trả về tối đa 5 combo có điểm phù hợp cao nhất.
@@ -256,7 +291,7 @@ def show_ai_explanation():
 
 
 DEFAULT_WEIGHTS = {
-    "budget_fit": 0.30, "preference_match": 0.25, "variety_bonus": 0.20,
+    "budget_fit": 0.25, "preference_match": 0.40, "variety_bonus": 0.10,
     "hunger_fit": 0.15, "thirst_fit": 0.10,
 }
 
